@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Courses</title>
+
+</head>
+
+<body>
+    <header id="header">
+        <a href="./courses.html">Home</a>
+        <a onclick="logout()" href='./index.html'>Log out</a>
+        <a href="./add-course.html">Add Course</a>
+    </header>
+<h1>Get the experience of real creators from around the world. </h1>
+    <button name="search" class="btn" onclick="search()">Search</button>
+    <input id="search" name="search" type="text" placeholder="Title">
+
+    <main id="conteiner">
+        <div class="loader"></div>
+    </main>
+
+    <button id="Show More Courses" class="btn" onclick="moreCourses()">View more courses</button>
+  
+    <button class="btn" onclick="location.href='./add-course.html';">Add course</button>
+
+
+
+    <script src="./service.js"></script>
+    <script>
+
+
+        const conteiner = document.querySelector('#conteiner');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const url = 'http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses';
+        let viewCourse = 0;
+
+        checkLogin();
+        requestSender('GET', url, moreCourses);
+
+
+        // function moreCourses() {
+        //     for (let i = viewCourse; i < viewCourse + 20; i++) {
+        //         new Course(theRequest.data.data[i]);
+        //     }
+        //     viewCourse += 20;
+        //     console.log(theRequest.data.data.length);
+        // }
+
+        function moreCourses() {
+            newToOld = theRequest.data.data.length
+            console.log(theRequest.data.data.length);
+            for (let i =  newToOld-1; i >  newToOld - 20; i--) {
+                new Course(theRequest.data.data[i]);
+            }
+            newToOld -= 20;
+            
+        }
+
+
+
+        function theNewCourse(res) {
+            console.log(res);
+        }
+
+
+        function search() {
+            let search = document.querySelector('#search').value;
+            theRequest.data.data.forEach(element => {
+
+                if (element.title == search) { new Course(element); }
+            });
+        }
+
+        
+
+
+    //     fetch(url,
+    // {
+    //     headers: {
+    //       'Accept': 'application/json',
+    //       'Content-Type': 'application/json'
+    //     },
+    //     method: "POST",
+    //     body: JSON.stringify(body)
+    // })
+    // .then(function(res){ console.log(res) })
+    // .catch(function(res){ console.log(res) })
+
+
+
+    </script>
+</body>
+
+</html>

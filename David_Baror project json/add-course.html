@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Add Course</title>
+
+</head>
+
+<body>
+    <header id="header">
+        <a href="./courses.html">Home</a>
+        <a onclick="logout()" href='./index.html'>Log out</a>
+    </header>
+
+    <main id="conteiner">
+        <div class="loader"></div>
+    </main>
+
+
+    <div class="conteiner">
+        <form id="formAddCourse">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="text" id="description" placeholder="description" required>
+            <input type="text" id="estimatedTime" placeholder="estimated Time">
+            <input type="text" id="materialsNeeded" placeholder="materials Needed"><br>
+
+            <ol id="formAddStep" class="conteiner"></ol>
+
+            <button id="addCours" class="btn" onclick="addCourse()">Add Course</button>
+        </form>
+    </div>
+
+
+    <script src="./service.js"></script>
+    <script>
+
+        const conteiner = document.querySelector('#conteiner');
+        const formStep = document.querySelector('#formAddStep');
+        const user = JSON.parse(localStorage.getItem('user'));
+        const url = 'http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses';
+        const form = document.querySelector('#formAddCourse');
+        let stepCount = 0;
+        let steps = [];
+
+
+      
+
+        function theNewCourse(res) {
+            console.log(res);
+            
+        }
+
+        function addStep() {
+            const addStep = new Step();
+        }
+
+
+        class Step {
+            constructor() {
+                stepCount++
+                const li = document.createElement('li');
+                formStep.appendChild(li);
+
+                const stepTitle = document.createElement('input');
+                stepTitle.placeholder = 'Step Title';
+                stepTitle.className = 'stepTitle';
+                li.appendChild(stepTitle);
+
+                const stepDescription = document.createElement('input');
+                stepDescription.placeholder = 'step Description';
+                stepDescription.className = 'stepDescription';
+                li.appendChild(stepDescription);
+
+                const remove = document.createElement('button');
+                remove.className = 'btn';
+                remove.innerText = 'Remove step';
+                li.appendChild(remove);
+                remove.onclick = () => {
+                    li.remove();
+                    stepCount--
+                }
+
+                const add = document.createElement('button');
+                add.className = 'btn';
+                add.innerText = 'add step';
+                formStep.appendChild(add);
+                add.onclick = () => {
+                    add.remove()
+                    const addStep = new Step();
+                }
+            }
+        }
+
+        function pushSteps() {
+            const stepTitle = document.querySelectorAll('.stepTitle');
+            const stepDescription = document.querySelectorAll('.stepDescription');
+
+            for (let i = 0; i < stepCount; i++) {
+                if (stepTitle[i].value && stepDescription[i].value) {
+                const step = {
+                    "stepNumber": i + 1,
+                    "title": stepTitle[i].value,
+                    "description": stepDescription[i].value
+                }
+                steps.push(step);
+            }
+        }
+    }
+        
+
+        function addCourse() {
+
+            const title = document.querySelector('#title').value;
+            const description = document.querySelector('#description').value;
+            const estimatedTime = document.querySelector('#estimatedTime').value;
+            const materialsNeeded = document.querySelector('#materialsNeeded').value;
+
+           
+            pushSteps();
+
+            if (title && description) {
+                let newCourse = {
+                    "user": {
+                        "_id": user._id,
+                        "fullName": user.fullName
+                    },
+                    "title": title,
+                    "description": description,
+                    "estimatedTime": estimatedTime,
+                    "materialsNeeded": materialsNeeded,
+                    "steps": steps
+                    ,
+                    "overallRating": 0,
+                    "reviews": []
+                }
+                const header = { 'name': user.emailAddress, "password": user.password }
+                let body = JSON.stringify(newCourse)
+                console.log(body);
+                requestSender('POST', url, theNewCourse, header, body);
+            } else {
+                alert('Please fill in all the fields')
+            }
+        }
+
+        checkLogin();
+        form.addEventListener('submit', e => { e.preventDefault() });
+        addStep();
+    </script>
+</body>
+
+</html>
+</script>
+</body>
+
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <title>Course-details</title>
+  <style>
+    #rating_bar {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      display: inline;
+    }
+  </style>
+</head>
+
+<body>
+  <header id="header">
+    <a href="./courses.html">Home</a>
+    <a onclick="logout()" href="./index.html">Log out</a>
+  </header>
+
+  <main id="conteiner">
+    <div class="loader"></div>
+  </main>
+  <div id="rating_bar"> </div><br><br>
+
+  <textarea name="review" id="review" cols="30" rows="10">Add a review</textarea><br>
+  <button class="rating btn" onclick="rating()">rating</button><br><br>
+  <button class="EditCourse btn" onclick="editCourse()">edit course</button>
+
+  <script src="./service.js"></script>
+  <script>
+
+
+    const conteiner = document.querySelector('#conteiner')
+    const user = JSON.parse(localStorage.getItem('user'))
+    let idCourse
+    const urlParams = new URLSearchParams(location.search);
+    for (const [key, value] of urlParams) {
+      idCourse = value;
+    }
+
+    let url = 'http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses/' + idCourse
+    let courseData = {}
+    let reviewData = {}
+    let numOfStars;
+    let access = true;
+    let content = '';
+    let spans = document.getElementById("rating_bar").getElementsByTagName('span');
+
+
+    function courseDetails(res) {
+      console.log(res.data[0]);
+      if (res) {
+        courseData = res.data[0]
+        randerToHtml('Title: ' + courseData.title, 'h1')
+        randerToHtml(`description: ${courseData.description}
+        materials Needed: ${courseData.materialsNeeded}
+        `, 'h2');
+        if (courseData.overallRating) {
+          randerToHtml(`over all Rating: ${courseData.overallRating}`, 'h1')
+        }
+        if (courseData.user) {
+          randerToHtml(`creator: ${courseData.user.fullName}`, 'h2')
+        }
+        for (const step of courseData.steps) {
+          randerToHtml(`
+            step Number: ${step.stepNumber}    
+            title: ${step.title}
+            description: ${step.description}`, 'h3')
+        };
+      }
+
+      for (const review of courseData.reviews) {
+        let stars = '';
+        for (i = 0; i < review.rating; i++) {
+          stars += '⭐';
+        }
+        randerToHtml(`Review
+    post date: ${review.postedOn}
+    rating: ${stars}
+    review: ${review.review}`, 'h4');
+      }
+
+      courseData.reviews.forEach((element) => {
+        sum += element.rating
+      })
+      if (courseData.reviews.length > 0) {
+        let averge = Math.floor(sum / courseData.reviews.length);
+        let starsAvrg = '';
+        for (i = 0; i < averge; i++) {
+          starsAvrg += '⭐';
+        }
+        randerToHtml(`The stars averge is ${starsAvrg}`, 'p')
+      }
+    }
+function editCourse() {
+  window.location.href = './edit-course.html?idCourse='+ idCourse;
+}
+
+    function courseUpdate(res) {
+      if (res) {
+        console.log(res);
+      }
+    }
+
+    function rating() {
+      reviewData = courseData.reviews
+      for (const review of reviewData) {
+        if (review.user) {
+          if (user.emailAddress == review.user.emailAddress) {
+            alert("Sorry, you can only add one review per course.")
+            access = false;
+          }
+        } else {
+          alert("Sorry, you canot add  review for that course.")
+          access = false;
+        }
+      }
+      if (access) {
+        if (courseData.user) {
+          if (courseData.user.emailAddress != user.emailAddress) {
+            let review = document.querySelector('#review').value
+            let rateUrl = url += '/reviews'
+            const header = { 'name': user.emailAddress, "password": user.password }
+            const rating = {
+              "rating": numOfStars,
+              "review": review
+            }
+            console.log(rating);
+            let body = JSON.stringify(rating)
+            requestSender('POST', rateUrl, courseUpdate, header, body)
+            url = 'http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses/' + idCourse
+          } else {
+            alert("Sorry, you can't review your own courses.")
+          }
+        } else {
+          alert("Sorry, you can't add  review for that course.")
+        }
+      }
+    }
+
+
+
+
+    for (let i = 1; i <= 5; i++) {
+      content += ' <span id="rate_' + i + '">✰</span> ';
+      document.getElementById('rating_bar').innerHTML = content;
+    }
+    for (i = 0; i < spans.length; i++) {
+      spans[i].onmouseover = hoverStar;
+    }
+
+    function hoverStar() {
+      numOfStars = this.id.charAt(5);
+      for (i = 0; i < this.id.charAt(5); i++) {
+        spans[i].innerText = '⭐';
+      }
+      for (i = this.id.charAt(5); i < 5; i++) {
+        spans[i].innerText = '✰';
+      }
+    }
+
+
+    checkLogin()
+    requestSender('GET', url, courseDetails)
+
+  </script>
+
+</body>
+
+</html>

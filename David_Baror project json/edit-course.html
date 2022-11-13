@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Edit Course</title>
+</head>
+
+<body>
+    <header id="header">
+        <a href="./courses.html">Home</a>
+        <a onclick="logout()" href="./index.html">Log out</a>
+    </header>
+    <form id="formEditCourse" class="conteiner"></form>
+    <main id="conteiner">
+        <div class="loader"></div>
+    </main>
+
+    </form>
+    <br><br>
+
+    <ol id="formAddStep" class="conteiner"></ol>
+
+
+    <script src="./service.js"></script>
+    <script>
+
+
+        const user = JSON.parse(localStorage.getItem('user'))
+        let idCourse
+        const urlParams = new URLSearchParams(location.search);
+        for (const [key, value] of urlParams) {
+            idCourse = value;
+        }
+
+        let url = 'http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses/' + idCourse
+        let courseData = {};
+        const formEditCourse = document.querySelector('#formEditCourse');
+        const formStep = document.querySelector('#formAddStep');
+        let stepCount = 0;
+
+
+
+
+        function courseDetails(res) {
+            console.log(res.data[0]);
+            if (res) {
+                courseData = res.data[0]
+
+                const title = document.createElement('input');
+                title.placeholder = 'Title';
+                title.id = 'title';
+                title.value = courseData.title;
+                formEditCourse.appendChild(title);
+
+                const br = document.createElement('br');
+                formEditCourse.appendChild(br);
+
+                const description = document.createElement('textarea');
+                description.placeholder = 'Description';
+                description.id = 'description';
+                description.value = courseData.description;
+                formEditCourse.appendChild(description);
+
+                const br2 = document.createElement('br');
+                formEditCourse.appendChild(br2);
+
+                const submit = document.createElement('button');
+                submit.className = 'btn';
+                submit.innerText = 'Update course';
+                formEditCourse.appendChild(submit);
+                submit.onclick = EditCourse;
+
+                if (courseData.user) {
+                    randerToHtml(`creator: ${courseData.user.fullName}`, 'h2')
+                }
+                for (const step of courseData.steps) {
+                    randerToHtml(`
+            step Number: ${step.stepNumber}    
+            title: ${step.title}
+            description: ${step.description}`, 'h3')
+                }
+            }
+        }
+
+        class Step {
+            constructor() {
+
+                stepCount++
+                const li = document.createElement('li');
+                formStep.appendChild(li);
+
+                const stepTitle = document.createElement('input');
+                stepTitle.placeholder = 'Step Title';
+                stepTitle.className = 'stepTitle';
+                li.appendChild(stepTitle);
+
+                const stepDescription = document.createElement('input');
+                stepDescription.placeholder = 'step Description';
+                stepDescription.className = 'stepDescription';
+                li.appendChild(stepDescription);
+
+                const remove = document.createElement('button');
+                remove.className = 'btn';
+                remove.innerText = 'Remove step';
+                li.appendChild(remove);
+                remove.onclick = () => {
+                    li.remove();
+                    stepCount--
+                }
+
+                const add = document.createElement('button');
+                add.className = 'btn';
+                add.innerText = 'add step';
+                formStep.appendChild(add);
+                add.onclick = () => {
+                    add.remove()
+                    submit.remove()
+                    const addStep = new Step();
+                }
+
+                const submit = document.createElement('button');
+                submit.className = 'btn';
+                submit.innerText = 'submit step';
+                formStep.appendChild(submit);
+                submit.onclick = addStep
+            }
+        }
+
+        function courseUpdate(res) {
+            if (res) {
+                console.log(res);
+            }
+        }
+
+
+        function EditCourse() {
+            const header = { 'name': user.emailAddress, "password": user.password }
+            const title = document.querySelector('#title').value;
+            const description = document.querySelector('#description').value;
+
+            if (courseData.user) {
+                if (courseData.user.emailAddress == user.emailAddress) {
+                    if (title && description) {
+                        courseData.title = title
+                        courseData.description = description
+
+                        let body = JSON.stringify(courseData)
+                        requestSender('PUT', url, courseUpdate, header, body)
+                    } else {
+                        alert("Enter all filds")
+                    }
+                } else {
+                    alert('Sorry, you can only edit a course that you created')
+                }
+            } else {
+                alert('Sorry, cant  edit this course ')
+            }
+        }
+
+        function addStep() {
+            if (courseData.user) {
+                if (courseData.user.emailAddress == user.emailAddress) {
+                    const header = { 'name': user.emailAddress, "password": user.password }
+                    const stepTitle = document.querySelectorAll('.stepTitle');
+                    const stepDescription = document.querySelectorAll('.stepDescription');
+
+
+                    for (let i = 0; i < stepCount; i++) {
+                        if (stepTitle[i].value && stepDescription[i].value) {
+                            const step = {
+                                "stepNumber": i + 1,
+                                "title": stepTitle[i].value,
+                                "description": stepDescription[i].value
+                            }
+                            courseData.steps.push(step);
+                        }
+                    } let body = JSON.stringify(courseData)
+                    requestSender('PUT', url, courseUpdate, header, body)
+                } else {
+                    alert('Sorry, you can only edit a course that you created')
+                }
+            } else {
+                alert("Sorry, can't  edit this course ")
+            }
+        }
+
+        checkLogin()
+        requestSender('GET', url, courseDetails)
+        new Step();
+        formEditCourse.addEventListener('submit', e => { e.preventDefault() })
+    </script>
+
+</body>
+
+</html>

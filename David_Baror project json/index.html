@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Sing in</title>
+   
+</head>
+
+<body>
+    <script src="./service.js"></script>
+
+    <header id="header">
+        <a href="./courses.html">Home</a>
+        <a onclick="logout()" href='./index.html'>Log out</a>
+        <a  href='./sing-up.html'>Sing up</a>
+        <a href="./add-course.html">Add Course</a>
+        
+    </header>
+<h1>Always More Inspiration to Discover</h1>
+<h3>
+    No matter your skill level, you’ll find so much to learn in a wide range of creative categories.</h3>
+    <h1>Sing in</h1>
+    <div class="conteiner">
+        <form id="loginForm" method="GET" action="http://jbh-9.us-east-2.elasticbeanstalk.com/api/users">
+            <label for="name">Enter your email: </label><br>
+            <input type="email" class="email sing-in" placeholder="Enter Email" name="name"
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required><br>
+            <label for="name">Enter your password: </label><br>
+            <input type="password" name="password" class="password sing-in" placeholder="Enter Password" required><br>
+            <button type="submit" class="submit btn" onclick="loginButton()">Submit</button>
+        </form>
+        <div class="loader"></div>
+    </div><br>
+
+    <a href="">I forgat my password</a>
+
+
+    </div>
+    <script>
+
+
+        const loginForm = document.querySelector('#loginForm');
+        const url = loginForm.action
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+
+        }
+        );
+
+        
+        function checkLog() {
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user != null) {
+                const loginDate = new Date(user.date);
+                const nowDate = new Date;
+                const timePass = nowDate - loginDate;
+                if (timePass > 60 * 60 * 1000) {
+                    logout()
+                } else {
+                    const header = document.querySelector('#header')
+                    const p = document.createElement('h4');
+                    p.innerText = 'Welcome ' + user.fullName;
+                    const name = header.appendChild(p)
+                }
+            }
+
+        }
+        checkLog()
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Courses</title>
+
+</head>
+
+<body>
+    <header id="header">
+        <a href="./courses.html">Home</a>
+        <a onclick="logout()" href='./index.html'>Log out</a>
+        <a href="./add-course.html">Add Course</a>
+    </header>
+    <h1>Get the experience of real creators from around the world. </h1>
+    <!-- <button name="search" class="btn" onclick="search()">Search</button> -->
+ <button id="Show More Courses" class="btn" onclick="rullUp()">View backward courses ⇧</button>
+    <input id="search" name="search" type="text" placeholder="🔍 Search Title" oninput="search()">
+
+    <main id="conteiner">
+        <div class="loader"></div>
+    </main>
+
+    <button id="Show More Courses" class="btn" onclick="rullDown()">View forward courses ⇩</button>
+   
+
+    <button class="btn" onclick="location.href='./add-course.html';">Add course</button>
+
+
+
+    <script src="./service.js"></script>
+    <script>
+
+        checkLogin();
+
+
+
+        const xhr = fetch('http://jbh-9.us-east-2.elasticbeanstalk.com/api/courses').then(res => res.json())
+            .then((data) => {
+                theRequest = data
+                moreCourses()
+            })
+
+
+        const conteiner = document.querySelector('#conteiner');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        let viewCourse = 0;
+        let numberCourses
+
+        function rullUp() {
+            let positionCourses = numberCourses - viewCourse;
+            let section = document.querySelectorAll('section');
+            section.forEach((element) => element.remove())
+            courseIdCounter -= 40
+
+            for (let i = positionCourses - 1; i < positionCourses + 20; i++) {
+                new Course(theRequest.data[i]);
+            }
+            viewCourse -= 20;
+            console.log(positionCourses);
+        }
+
+
+        function rullDown() {
+            let positionCourses = numberCourses - viewCourse;
+            let section = document.querySelectorAll('section');
+            section.forEach((element) => element.remove())
+           
+
+            for (let i = positionCourses - 1; i > positionCourses - 20; i--) {
+                new Course(theRequest.data[i]);
+            }
+            viewCourse += 20;
+            console.log(positionCourses);
+        }
+
+        function moreCourses() {
+            numberCourses = theRequest.data.length
+            rullDown()
+        }
+
+
+        function theNewCourse(res) {
+            console.log(res);
+        }
+
+
+        function search() {
+            let search = document.querySelector('#search').value;
+            let section = document.querySelectorAll('section');
+            section.forEach((element) => element.remove())
+            theRequest.data.forEach(element => {
+                let find = element.title.search(search)
+                if (find > -1) { new Course(element); }
+
+            }
+            );
+        }
+
+
+
+    </script>
+</body>
+
+</html>
