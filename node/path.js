@@ -1,14 +1,14 @@
-const path = require('path') ;
-const os = require('os') ;
+import { parse } from 'path';
+import { freemem, totalmem, userInfo, uptime } from 'os';
 
-const pathObj = path.parse(__filename)
+const pathObj = parse(__filename)
 
 console.log(pathObj);
 console.log(
-   os.freemem(),
-os.totalmem(),
-os.userInfo(),
-os.uptime() 
+   freemem(),
+    totalmem(),
+userInfo(),
+uptime() 
 );
 
 console.log(__filename);
