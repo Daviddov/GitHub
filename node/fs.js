@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const fsp = require('fs').promises()
+// const fsp = require('fs').promises()
 
 // console.log(fs.readdirSync('./'));
 // console.log(fs.readdir('./', (err, file)=> {
@@ -13,11 +13,10 @@ const fsp = require('fs').promises()
 //     if (err) throw err;
 //     console.log(data);
 //   }))
-
-// console.log(fs.appendFile('message.txt', 'data to append', (err) => {
-//     if (err) throw err;
-//     console.log('The "data to append" was appended to file!');
-//   }));
+fs.appendFile('../react/message.txt', 'data to append', (err) => {
+    if (err) {throw err;
+    console.log(err);}
+  });
 
 //   console.log(fs.open('message.txt', 'w', (err) => {
 //     if (err) throw err;
@@ -39,4 +38,4 @@ const fsp = require('fs').promises()
 //     console.log('File Renamed!');
 //   });
 
-console.log(fsp.appendFile);
+// console.log(fs.appendFile);
