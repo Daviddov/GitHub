@@ -10,4 +10,5 @@ function prime(until) {
         }
     }
 }
-prime(process.argv[2] || 10)
+module.exports = prime
+// prime(process.argv[2])

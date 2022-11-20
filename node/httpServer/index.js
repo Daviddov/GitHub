@@ -1,5 +1,8 @@
 const http = require('http')
 const fs = require('fs')
+const factorial = require('./files/factorial')
+const prime = require('./files/prime')
+
 const server = http.createServer((req, res) => {
     const { url } = req;
     const urlSplit = url.split('/')
@@ -79,12 +82,21 @@ const server = http.createServer((req, res) => {
                     });
                 }
                 break;
-                case 'comps':
-                    fs.readFile('./files/comps.html', function (err, data) {
-                        res.writeHead(200, { 'Content-Type': 'text/html' });
-                        res.write(data);
-                        return res.end();
-                    })
+            case 'comps':
+                console.log('compos');
+                if (urlSplit[2] === 'factorial') {
+                    console.log('factorial');
+
+                    console.log(factorial(urlSplit[3]));
+                    return res.end();
+                }
+                // else if (urlSplit[2] === prime) {
+                //     fs.readFile('./files/comps.html', function (err, data) {
+                //         res.writeHead(200, { 'Content-Type': 'text/html' });
+                //         res.write(data);
+                //         return res.end();
+                //     })
+                // }
                 break;
             default:
                 console.log(url, urlSplit);
