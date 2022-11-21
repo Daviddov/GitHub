@@ -65,14 +65,16 @@ const server = http.createServer(async (req, res) => {
                 console.log('compos');
                 if (urlSplit[2] === 'factorial') {
                     console.log('factorial');
-                    const data = await factorial(urlSplit[3]);
+
+                    const data = factorial(urlSplit[3]);
                     console.log(data);
                     res.write(`<h1>${data.toString()}</h1>`);
                     return res.end();
                 }
+
                 else if (urlSplit[2] === 'prime') {
                     console.log('prime');
-                    const data = await prime(urlSplit[3])
+                    const data = prime(urlSplit[3])
 
                     res.write(`<h1>${data.toString()}</h1>`);
                     return res.end();
