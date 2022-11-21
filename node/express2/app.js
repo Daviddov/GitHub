@@ -10,40 +10,43 @@ const courses = [
     { id: 3, name: 'course3' },
 ];
 
-app.get(/a/,(req,res)=>{
-    console.log(req.params);
- 
-})
-app.delete('/courses/:id', (req, res) => {
-    // look up for the course
-    const course = courses.find(c => c.id === parseInt(req.params.id))
-    if (!course) return res.status(404).send('The course mot found')
-// delete
-const index = courses.indexOf(course);
-courses.splice(index, 1);
-// return the course
-    res.send(course)
-})
+// app.get(/a/,(req,res)=>{
+//     console.log(req.params);
 
-app.put('/courses/:id', (req, res) => {
-    // look up for the course
-    const course = courses.find(c => c.id === parseInt(req.params.id))
-    if (!course) return res.status(404).send('The course mot found')
-    // validate
-    const { error } = validateCourse(req.body)
-    if (error) return res.status(400).send(error.details[0].message)
-    // update
-    course.name = req.body.name;
-    res.send(course)
-})
+// })
 
-app.get('/courses/:id', (req, res) => {
-    console.log(req.params);
-    console.log(req);
-    const course = courses.find(c => c.id === parseInt(req.params.id))
-    if (!course) return res.status(404).send('The course mot found')
-    res.send(course)
-});
+
+app.route('/courses/:id')
+    .delete((req, res) => {
+        // look up for the course
+        const course = courses.find(c => c.id === parseInt(req.params.id))
+        if (!course) return res.status(404).send('The course mot found')
+        // delete
+        const index = courses.indexOf(course);
+        courses.splice(index, 1);
+        // return the course
+        res.send(course)
+    })
+    .put((req, res) => {
+        // look up for the course
+        const course = courses.find(c => c.id === parseInt(req.params.id))
+        if (!course) return res.status(404).send('The course mot found')
+        // validate
+        const { error } = validateCourse(req.body)
+        if (error) return res.status(400).send(error.details[0].message)
+        // update
+        course.name = req.body.name;
+        res.send(course)
+    })
+    .get((req, res) => {
+        console.log(req.params);
+        console.log(req);
+        const course = courses.find(c => c.id === parseInt(req.params.id))
+        if (!course) return res.status(404).send('The course mot found')
+
+        res.send(course)
+    });
+
 
 app.post('/courses', (req, res) => {
     const result = validateCourse(req.body)
