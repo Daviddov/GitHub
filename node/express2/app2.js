@@ -1,6 +1,8 @@
 const express = require('express');
+const birds = require('./birds');
 const app = express();
 
+app.use('/birds', birds);
 
 app.all('/', (req, res, next) => {
     console.log('hello');
